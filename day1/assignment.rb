@@ -1,6 +1,6 @@
 books = []
 
-def addbook(books)
+def add_book(books)
   puts "Adding the book"
   print "Enter the book name: "
   name = gets.chomp.strip
@@ -18,45 +18,60 @@ def addbook(books)
   puts "Book added successfully"
 end
 
-def listbooks(books)
-  puts "Top 3 books"
-  books.first(3).each { |book| puts book[:name] +" by "+ book[:author] +" in "+ book[:year].to_s + " (" + book[:genre] + ")" }#need to use .to_s as year is int
+def list_books(books)
+  if books.empty?
+    puts " library is empty"
+  else
+    puts "Top books"
+    books.first(3).each { |book| puts book[:name] +" by "+ book[:author] +" in "+ book[:year].to_s + " (" + book[:genre] + ")" }#need to use .to_s as year is int
+  end
 end 
 
 
-def listallbooks(books)
-  puts "Listing all books"
-  books.each do |book|
-    puts " #{book[:name]} by #{book[:author]} in #{book[:year]} (#{book[:genre]})"
+def list_all_books(books)
+  if books.empty?
+    puts " library is empty"
+  else
+    puts "Listing all books"
+    books.each do |book|
+      puts " #{book[:name]} by #{book[:author]} in #{book[:year]} (#{book[:genre]})"
+    end
   end
 end
 
-def searchbook(books)
-  puts "Searching book"
-  print "Enter the book name to search: "
-  name = gets.chomp.downcase.strip
-  books.each do |book|
-    if book[:name].downcase == name
-      puts "Book found: #{book[:name]} by #{book[:author]} in #{book[:year]} (#{book[:genre]})"
-      return
-    end
-  end
-  puts "Book not found"
-  
-end 
-def searchgenere(books)
-  puts "Searching book by genere "
-  print "Enter the book Genere to search: "
-  genre = gets.chomp.downcase.strip
-  gen_filter = books.reject { |book| book[:genre].downcase != genre }
-  if gen_filter.empty?
-    puts "no book found in this genere"
+def search_book(books)
+  if books.empty?
+    puts " library is empty"
   else
-    gen_filter.each { |book| puts "Book found: #{book[:name]} by #{book[:author]} in #{book[:year]} (#{book[:genre]})" }
+    puts "Searching book"
+    print "Enter the book name to search: "
+    name = gets.chomp.downcase.strip
+    books.each do |book|
+      if book[:name].downcase == name
+        puts "Book found: #{book[:name]} by #{book[:author]} in #{book[:year]} (#{book[:genre]})"
+      return
+      end
+    end
+    puts "Book not found"
+  end
+end 
+def search_genre(books)
+  if books.empty?
+    puts " library is empty"
+  else
+    puts "Searching book by genre "
+    print "Enter the book genre to search: "
+    genre = gets.chomp.downcase.strip
+    gen_filter = books.reject { |book| book[:genre].downcase != genre }
+    if gen_filter.empty?
+      puts "no book found in this genre"
+    else
+      gen_filter.each { |book| puts "Book found: #{book[:name]} by #{book[:author]} in #{book[:year]} (#{book[:genre]})" }
+    end
   end
 end 
 
-def uppdatebooks(books)
+def update_book(books)
   print "Enter the book name to update: "
   name = gets.chomp.downcase.strip
   books.each do |book|
@@ -84,7 +99,7 @@ def uppdatebooks(books)
   puts "Book not found please enter a valid book name"
   
 end 
-def deletebook(books)
+def delete_book(books)
   print "Enter the book name to be delete: "
   name = gets.chomp.downcase.strip
   temp = books.reject! { |book| book[:name].downcase == name }
@@ -95,7 +110,7 @@ def deletebook(books)
   end
 end
 
-def spanishmenu
+def spanish_menu
     puts "sistema de gestion de biblioteca (menu oculto español)"
     puts "1. agregar libro"
     puts "2. listar libro"
@@ -107,9 +122,28 @@ def spanishmenu
     gets.chomp
 end
 
+def book_summary(books)
+  if books.empty?
+    puts "Library is empty \n no recent books or old books"
+  else
+    least = books.first[:year]
+    least_book = books.first[:name]
+    puts "books Summary"
+    puts "Total books: #{books.length}"
+    books.each do |book|
+      if book[:year] < least
+        least = book[:year]
+        least_book = book[:name]
+      end
+    end
+    puts "Oldest book: #{least_book} in our library released in #{least}"
+    puts "Recent Book: #{books[-1][:name]} in our library"
+  end
+end
 
-while true
-  puts "~~~~~~~Welcome to the library Management System~~~~~~~(hidden menu spanish)"
+
+def display_menu
+  puts "~~~~~~~Welcome to the library Management System~~~~~~~"
   puts "1. Add book"
   puts "2. list book"
   puts "3. search book"
@@ -118,36 +152,43 @@ while true
   puts "6. exit"
   puts"7. list all books"
   puts "8.search by genere"
+  puts "9.book_summary"
   print "Enter your choice: "
-    choice = gets.chomp
+end
+
+
+loop do
+  display_menu
+  choice = gets.chomp
     case choice
     when "0"
-        spanishmenu
+        spanish_menu
     when "1"
-      addbook(books)
+      add_book(books)
     when "2"
-      listbooks(books)
+      list_books(books)
     when "3"
-      searchbook(books)
+      search_book(books)
     when "4"
-      uppdatebooks(books)
+      update_book(books)
     when "5"
-      deletebook(books)
+      delete_book(books)
     when "6"
       puts "Exit Good bye !"
       break
     when "7"
-      listallbooks(books)
+      list_all_books(books)
     when "8"
-      searchgenere(books)
+      search_genre(books)
+    when "9"
+      book_summary(books)
     else
       puts "Invalid choice please enter a valid option"
     end
 end
 
-=begin 
-========output======== 
-~~~~~~Welcome to the library Management System~~~~~~~(hidden menu spanish)
+=begin
+~~~~~~Welcome to the library Management System~~~~~~~
 1. Add book
 2. list book
 3. search book
@@ -156,73 +197,16 @@ end
 6. exit
 7. list all books
 8.search by genere
-Enter your choice: 1
-Adding the book
-Enter the book name: Harry Potter
-Enter the author name: J K Rowling
-Enter the publication year: 2000
-Enter the book genre: fiction
-Book added successfully
-~~~~~~~Welcome to the library Management System~~~~~~~(hidden menu spanish)
-1. Add book
-2. list book
-3. search book
-4. uppdate book
-5. delete book
-6. exit
-7. list all books
-8.search by genere
-Enter your choice: 1
-Adding the book
-Enter the book name: Atomic Habits
-Enter the author name: James Clear
-Enter the publication year: 2024
-Enter the book genre: self motivation
-Book added successfully
-~~~~~~~Welcome to the library Management System~~~~~~~(hidden menu spanish)
-1. Add book
-2. list book
-3. search book
-4. uppdate book
-5. delete book
-6. exit
-7. list all books
-8.search by genere
-Enter your choice: 2
-Top 3 books
-Harry Potter by J K Rowling in 2000 (fiction)
-Atomic Habits by James Clear in 2024 (self motivation)
-~~~~~~~Welcome to the library Management System~~~~~~~(hidden menu spanish)
-1. Add book
-2. list book
-3. search book
-4. uppdate book
-5. delete book
-6. exit
-7. list all books
-8.search by genere
-Enter your choice: 1
-Adding the book
-Enter the book name: ruby
-Enter the author name: aaaa
-Enter the publication year: 2005
-Enter the book genre: 
-Book added successfully
-~~~~~~~Welcome to the library Management System~~~~~~~(hidden menu spanish)
-1. Add book
-2. list book
-3. search book
-4. uppdate book
-5. delete book
-6. exit
-7. list all books
-8.search by genere
+9.book_summary
 Enter your choice: 7
 Listing all books
- Harry Potter by J K Rowling in 2000 (fiction)
- Atomic Habits by James Clear in 2024 (self motivation)
- ruby by aaaa in 2005 (Uncategorized)
-~~~~~~~Welcome to the library Management System~~~~~~~(hidden menu spanish)
+ harry potter by J K Rowling in 2000 (Fiction)
+ Ruby on Rails by zzzz in 2024 (Education)
+ Software Engineering by www in 2025 (Education)
+ old book and recent added by zzz in 1999 (Uncategorized)
+
+
+~~~~~~~Welcome to the library Management System~~~~~~~
 1. Add book
 2. list book
 3. search book
@@ -231,72 +215,10 @@ Listing all books
 6. exit
 7. list all books
 8.search by genere
-Enter your choice: 3
-Searching book
-Enter the book name to search: ruby
-Book found: ruby by aaaa in 2005 (Uncategorized)
-~~~~~~~Welcome to the library Management System~~~~~~~(hidden menu spanish)
-1. Add book
-2. list book
-3. search book
-4. uppdate book
-5. delete book
-6. exit
-7. list all books
-8.search by genere
-Enter your choice: 4
-Enter the book name to update: ruby
-Enter the book new name: ruby
-Enter the author new name: sss 
-Enter the new publication year: 2005
-Enter the new book genre: 
-Book updated successfully
-~~~~~~~Welcome to the library Management System~~~~~~~(hidden menu spanish)
-1. Add book
-2. list book
-3. search book
-4. uppdate book
-5. delete book
-6. exit
-7. list all books
-8.search by genere
-Enter your choice: 5
-Enter the book name to be delete: ruby
-Book deleted successfully
-~~~~~~~Welcome to the library Management System~~~~~~~(hidden menu spanish)
-1. Add book
-2. list book
-3. search book
-4. uppdate book
-5. delete book
-6. exit
-7. list all books
-8.search by genere
-Enter your choice: 5
-Enter the book name to be delete: qwerty
-Book not found please enter a valid book name
-~~~~~~~Welcome to the library Management System~~~~~~~(hidden menu spanish)
-1. Add book
-2. list book
-3. search book
-4. uppdate book
-5. delete book
-6. exit
-7. list all books
-8.search by genere
-Enter your choice: 7
-Listing all books
- Harry Potter by J K Rowling in 2000 (fiction)
- Atomic Habits by James Clear in 2024 (self motivation)
-~~~~~~~Welcome to the library Management System~~~~~~~(hidden menu spanish)
-1. Add book
-2. list book
-3. search book
-4. uppdate book
-5. delete book
-6. exit
-7. list all books
-8.search by genere
-Enter your choice: 6
-Exit Good bye !
+9.book_summary
+Enter your choice: 9
+books Summary
+Total books: 4
+Oldest book: old book and recent added in our library released in 1999
+Recent Book: old book and recent added in our library
 =end
