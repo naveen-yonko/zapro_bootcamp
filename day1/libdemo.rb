@@ -14,15 +14,23 @@ def addbook(books)
 end
 
 def listbooks(books)
-  puts "Top 3 books"
-  books.first(3).each { |book| puts book[:name] +" by "+ book[:author] +" in "+ book[:year].to_s }#need to use .to_s as year is int
-end 
+  if books.empty?
+    puts " library is empty"
+  else
+    puts "Top 3 books"
+    books.first(3).each { |book| puts book[:name] +" by "+ book[:author] +" in "+ book[:year].to_s }#need to use .to_s as year is int
+  end
+end
 
 
 def listallbooks(books)
-  puts "Listing all books"
-  books.each do |book|
-    puts " #{book[:name]} by #{book[:author]} in #{book[:year]}"
+  if books.empty?
+    puts " library is empty"
+  else
+    puts "Listing all books"
+    books.each do |book|
+      puts " #{book[:name]} by #{book[:author]} in #{book[:year]}"
+    end
   end
 end
 
@@ -72,16 +80,19 @@ def deletebook(books)
   end
 end
 
+def show_menu
+  puts "Library Management System"
+  puts "1. Add Book"
+  puts "2. List Books"
+  puts "3. Search Book"
+  puts "4. Update Book"
+  puts "5. Delete Book"
+  puts "6. Exit"
+  print "Enter your choice: "
+end
+
 loop do
-    puts "library management system"
-    puts "1. add book"
-    puts "2. list book"
-    puts "3. search book"
-    puts "4. update book"
-    puts "5. delete book"
-    puts "6. exit"
-    puts"7. list all books"
-    print "enter your choice: "
+    show_menu
     choice = gets.chomp.to_i
     case choice
     when 1
