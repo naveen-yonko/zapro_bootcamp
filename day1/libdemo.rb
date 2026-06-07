@@ -1,4 +1,12 @@
-books = []
+books = [
+  { name: "To Kill a Mockingbird", author: "Harper Lee", year: 1960 },
+  { name: "The Great Gatsby", author: "F. Scott Fitzgerald", year: 1925 },
+  { name: "Harry Potter", author: "J.K. Rowling", year: 1997 },
+  { name: "The Da Vinci Code", author: "Dan Brown", year: 2003 },
+  { name: "The Hunger Games", author: "Suzanne Collins", year: 2008 },
+  { name: "Project Hail Mary", author: "Andy Weir", year: 2021 },
+  { name: "The Alchemist", author: "Paulo Coelho", year: 1988 },
+]
 
 def addbook(books)
   puts "Adding the book"
@@ -96,6 +104,33 @@ def dev_stats(books)
   end
 end
 
+def books_btw_years(books)
+  if books.empty?
+    puts "Library is empty "
+  else
+    puts "Books between years"
+    print "Enter the start year: "
+    strt_year = gets.chomp.to_i
+    print "Enter the end year: "
+    end_year = gets.chomp.to_i
+    if strt_year > end_year
+      puts "Invalid search range"
+    else
+      temp = books.select do |book|
+        book[:year] >= strt_year && book[:year] <= end_year
+      end
+      if temp.empty?
+        puts "No book found in this range (#{strt_year} - #{end_year})"
+      else
+        temp1 = temp.sort_by { |book| book[:year] }
+        temp1.each_with_index do |book , idx|
+          puts " #{idx + 1}: #{book[:name]} by #{book[:author]} in #{book[:year]}"
+        end
+      end
+    end
+  end
+end
+
 def show_menu
   puts "Library Management System"
   puts "1. Add Book"
@@ -106,6 +141,7 @@ def show_menu
   puts "6. Exit"
   puts "7. List All Books"
   puts "8. dev sats"
+  puts "9. Books between years"
   print "Enter your choice: "
 end
 
@@ -130,6 +166,8 @@ loop do
         listallbooks(books)
     when 8
         dev_stats(books)
+    when 9
+        books_btw_years(books)
     else
         puts "invalid choice please enter a valid option"
     end
@@ -145,69 +183,16 @@ Library Management System
 6. Exit
 7. List All Books
 8. dev sats
-Enter your choice: 1
-Adding the book
-Enter the book name: harry
-Enter the author name: JK
-Enter the publication year: 2001
-Book added successfully
-Library Management System
-1. Add Book
-2. List Books
-3. Search Book
-4. Update Book
-5. Delete Book
-6. Exit
-7. List All Books
-8. dev sats
-Enter your choice: 1
-Adding the book
-Enter the book name: potter
-Enter the author name: rowling
-Enter the publication year: 2002
-Book added successfully
-Library Management System
-1. Add Book
-2. List Books
-3. Search Book
-4. Update Book
-5. Delete Book
-6. Exit
-7. List All Books
-8. dev sats
-Enter your choice: 1
-Adding the book
-Enter the book name: qwert
-Enter the author name: trewq
-Enter the publication year: 1999
-Book added successfully
-Library Management System
-1. Add Book
-2. List Books
-3. Search Book
-4. Update Book
-5. Delete Book
-6. Exit
-7. List All Books
-8. dev sats
-Enter your choice: 3
-Searching book
-Enter the book name to search: harry
-Book found: harry by JK in 2001
-Library Management System
-1. Add Book
-2. List Books
-3. Search Book
-4. Update Book
-5. Delete Book
-6. Exit
-7. List All Books
-8. dev sats
+9. Books between years
 Enter your choice: 7
 Listing all books
- harry by JK in 2001
- potter by rowling in 2002
- qwert by trewq in 1999
+ To Kill a Mockingbird by Harper Lee in 1960
+ The Great Gatsby by F. Scott Fitzgerald in 1925
+ Harry Potter by J.K. Rowling in 1997
+ The Da Vinci Code by Dan Brown in 2003
+ The Hunger Games by Suzanne Collins in 2008
+ Project Hail Mary by Andy Weir in 2021
+ The Alchemist by Paulo Coelho in 1988
 Library Management System
 1. Add Book
 2. List Books
@@ -217,13 +202,14 @@ Library Management System
 6. Exit
 7. List All Books
 8. dev sats
-Enter your choice: 8
-total count 3
-Books published after 2000: 2
-Unique Auth List:
- 1: JK
- 2: rowling
- 3: trewq
+9. Books between years
+Enter your choice: 9
+Books between years
+Enter the start year: 2000
+Enter the end year: 2025
+ 1: The Da Vinci Code by Dan Brown in 2003
+ 2: The Hunger Games by Suzanne Collins in 2008
+ 3: Project Hail Mary by Andy Weir in 2021
 Library Management System
 1. Add Book
 2. List Books
@@ -233,6 +219,37 @@ Library Management System
 6. Exit
 7. List All Books
 8. dev sats
+9. Books between years
+Enter your choice: 9
+Books between years
+Enter the start year: 2024
+Enter the end year: 1999
+Invalid search range
+Library Management System
+1. Add Book
+2. List Books
+3. Search Book
+4. Update Book
+5. Delete Book
+6. Exit
+7. List All Books
+8. dev sats
+9. Books between years
+Enter your choice: 9
+Books between years
+Enter the start year: 2000
+Enter the end year: 2001
+No book found in this range (2000 - 2001)
+Library Management System
+1. Add Book
+2. List Books
+3. Search Book
+4. Update Book
+5. Delete Book
+6. Exit
+7. List All Books
+8. dev sats
+9. Books between years
 Enter your choice: 6
 exiting Good bye !
 =end
