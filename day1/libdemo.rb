@@ -8,14 +8,37 @@ books = [
   { name: "The Alchemist", author: "Paulo Coelho", year: 1988 },
 ]
 
+def validate_input(value, field_name)
+if value.strip.empty?
+puts "#{field_name} cannot be blank."
+return false
+end
+true
+end
+
+
 def addbook(books)
   puts "Adding the book"
+
   print "Enter the book name: "
   name = gets.chomp.strip
+  if !validate_input(name, "Book name")
+    return
+  end
+
   print "Enter the author name: "
   author = gets.chomp.strip
+  if !validate_input(author, "Author name")
+    return
+  end
+
   print "Enter the publication year: "
   year = gets.chomp.to_i
+  if year <= 0
+    puts "Publication year must be a positive integer."
+    return
+  end
+
   book = { name: name, author: author, year: year }
   books.push(book)  #books << book we can also use this
   puts "Book added successfully"
@@ -45,7 +68,10 @@ end
 def searchbook(books)
   puts "Searching book"
   print "Enter the book name to search: "
-  name = gets.chomp.downcase.strip
+  name = gets.chomp.downcase
+  if !validate_input(name, "Book name")
+    return
+  end
   books.find do |book|
     if book[:name].downcase == name
       puts "Book found: #{book[:name]} by #{book[:author]} in #{book[:year]}"
@@ -58,6 +84,9 @@ end
 def uppdatebooks(books)
   print "Enter the book name to update: "
   name = gets.chomp.downcase.strip
+  if !validate_input(name, "Book name")
+    return
+  end
   books.each do |book|
     if book[:name].downcase == name
       print "Enter the book new name: "
@@ -79,6 +108,10 @@ end
 def deletebook(books)
   print "Enter the book name to be delete: "
   name = gets.chomp.downcase.strip
+  if !validate_input(name, "Book name")
+    return
+  end
+
   temp = books.reject! { |book| book[:name].downcase == name }
   if temp.nil?
     puts "Book not found please enter a valid book name"
@@ -184,15 +217,10 @@ Library Management System
 7. List All Books
 8. dev sats
 9. Books between years
-Enter your choice: 7
-Listing all books
- To Kill a Mockingbird by Harper Lee in 1960
- The Great Gatsby by F. Scott Fitzgerald in 1925
- Harry Potter by J.K. Rowling in 1997
- The Da Vinci Code by Dan Brown in 2003
- The Hunger Games by Suzanne Collins in 2008
- Project Hail Mary by Andy Weir in 2021
- The Alchemist by Paulo Coelho in 1988
+Enter your choice: 1
+Adding the book
+Enter the book name: 
+Book name cannot be blank.
 Library Management System
 1. Add Book
 2. List Books
@@ -203,43 +231,10 @@ Library Management System
 7. List All Books
 8. dev sats
 9. Books between years
-Enter your choice: 9
-Books between years
-Enter the start year: 2000
-Enter the end year: 2025
- 1: The Da Vinci Code by Dan Brown in 2003
- 2: The Hunger Games by Suzanne Collins in 2008
- 3: Project Hail Mary by Andy Weir in 2021
-Library Management System
-1. Add Book
-2. List Books
-3. Search Book
-4. Update Book
-5. Delete Book
-6. Exit
-7. List All Books
-8. dev sats
-9. Books between years
-Enter your choice: 9
-Books between years
-Enter the start year: 2024
-Enter the end year: 1999
-Invalid search range
-Library Management System
-1. Add Book
-2. List Books
-3. Search Book
-4. Update Book
-5. Delete Book
-6. Exit
-7. List All Books
-8. dev sats
-9. Books between years
-Enter your choice: 9
-Books between years
-Enter the start year: 2000
-Enter the end year: 2001
-No book found in this range (2000 - 2001)
+Enter your choice: 3
+Searching book
+Enter the book name to search: 
+Book name cannot be blank.
 Library Management System
 1. Add Book
 2. List Books
