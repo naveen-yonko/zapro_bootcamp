@@ -94,6 +94,12 @@ def uppdatebooks(books)
       if !validate_input(n_name, "Book name")
         return
       end
+      puts "Rename #{book[:name]} --> #{n_name}(y/n)"
+      reply = gets.chomp.downcase.strip
+      if reply == 'n'
+        puts "Update cancelled"
+        return
+      end
       print "Enter the author new name: "
       n_author = gets.chomp.strip
       print "Enter the new publication year: "
@@ -210,26 +216,6 @@ loop do
 end
 
 =begin
-Library Management System
-1. Add Book
-2. List Books
-3. Search Book
-4. Update Book
-5. Delete Book
-6. Exit
-7. List All Books
-8. dev sats
-9. Books between years
-Enter your choice: 7
-Listing all books
- To Kill a Mockingbird by Harper Lee in 1960
- The Great Gatsby by F. Scott Fitzgerald in 1925
- Harry Potter by J.K. Rowling in 1997
- The Da Vinci Code by Dan Brown in 2003
- The Hunger Games by Suzanne Collins in 2008
- Project Hail Mary by Andy Weir in 2021
- The Alchemist by Paulo Coelho in 1988
-Library Management System
 1. Add Book
 2. List Books
 3. Search Book
@@ -240,22 +226,13 @@ Library Management System
 8. dev sats
 9. Books between years
 Enter your choice: 4
-Enter the book name to update: 
-Book name cannot be blank.
-Library Management System
-1. Add Book
-2. List Books
-3. Search Book
-4. Update Book
-5. Delete Book
-6. Exit
-7. List All Books
-8. dev sats
-9. Books between years
-Enter your choice: 4
-Enter the book name to update: harry Potter 
-Enter the book new name:   
-Book name cannot be blank.
+Enter the book name to update: harry POTTER
+Enter the book new name: hArRy PoTtEr
+Rename Harry Potter --> hArRy PoTtEr(y/n)
+y
+Enter the author new name: jk
+Enter the new publication year: 2000
+Book updated successfully
 Library Management System
 1. Add Book
 2. List Books
@@ -268,10 +245,10 @@ Library Management System
 9. Books between years
 Enter your choice: 4
 Enter the book name to update: harry potter
-Enter the book new name: hARRY pOTTER
-Enter the author new name: JK Rowling
-Enter the new publication year: 2014
-Book updated successfully
+Enter the book new name: harry
+Rename hArRy PoTtEr --> harry(y/n)
+n
+Update cancelled
 Library Management System
 1. Add Book
 2. List Books
@@ -286,7 +263,7 @@ Enter your choice: 7
 Listing all books
  To Kill a Mockingbird by Harper Lee in 1960
  The Great Gatsby by F. Scott Fitzgerald in 1925
- hARRY pOTTER by JK Rowling in 2014
+ hArRy PoTtEr by jk in 2000
  The Da Vinci Code by Dan Brown in 2003
  The Hunger Games by Suzanne Collins in 2008
  Project Hail Mary by Andy Weir in 2021
@@ -302,5 +279,6 @@ Library Management System
 8. dev sats
 9. Books between years
 Enter your choice: 6
-exiting Good bye !cd ..
+exiting Good bye !
 =end
+
