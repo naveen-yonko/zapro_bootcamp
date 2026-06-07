@@ -38,14 +38,13 @@ def searchbook(books)
   puts "Searching book"
   print "Enter the book name to search: "
   name = gets.chomp.downcase.strip
-  books.each do |book|
+  books.find do |book|
     if book[:name].downcase == name
       puts "Book found: #{book[:name]} by #{book[:author]} in #{book[:year]}"
       return
     end
   end
   puts "Book not found"
-  
 end 
 
 def uppdatebooks(books)
@@ -79,6 +78,23 @@ def deletebook(books)
     puts "Book deleted successfully"
   end
 end
+def dev_stats(books)
+  if books.empty?
+    puts "Library is empty "
+  else
+    puts "total count #{books.count}"
+    temp = books.count do |book|
+      book[:year] > 2000
+    end
+    puts "Books published after 2000: #{temp}"
+    temp = books.map { |book| book[:author] }
+    uniq_auth = temp.uniq
+    puts "Unique Auth List:"
+    uniq_auth.each_with_index do |a,idx|
+      puts " #{idx + 1}: #{a}"
+    end
+  end
+end
 
 def show_menu
   puts "Library Management System"
@@ -88,6 +104,8 @@ def show_menu
   puts "4. Update Book"
   puts "5. Delete Book"
   puts "6. Exit"
+  puts "7. List All Books"
+  puts "8. dev sats"
   print "Enter your choice: "
 end
 
@@ -110,7 +128,111 @@ loop do
         break
     when 7
         listallbooks(books)
+    when 8
+        dev_stats(books)
     else
         puts "invalid choice please enter a valid option"
     end
 end
+
+=begin
+Library Management System
+1. Add Book
+2. List Books
+3. Search Book
+4. Update Book
+5. Delete Book
+6. Exit
+7. List All Books
+8. dev sats
+Enter your choice: 1
+Adding the book
+Enter the book name: harry
+Enter the author name: JK
+Enter the publication year: 2001
+Book added successfully
+Library Management System
+1. Add Book
+2. List Books
+3. Search Book
+4. Update Book
+5. Delete Book
+6. Exit
+7. List All Books
+8. dev sats
+Enter your choice: 1
+Adding the book
+Enter the book name: potter
+Enter the author name: rowling
+Enter the publication year: 2002
+Book added successfully
+Library Management System
+1. Add Book
+2. List Books
+3. Search Book
+4. Update Book
+5. Delete Book
+6. Exit
+7. List All Books
+8. dev sats
+Enter your choice: 1
+Adding the book
+Enter the book name: qwert
+Enter the author name: trewq
+Enter the publication year: 1999
+Book added successfully
+Library Management System
+1. Add Book
+2. List Books
+3. Search Book
+4. Update Book
+5. Delete Book
+6. Exit
+7. List All Books
+8. dev sats
+Enter your choice: 3
+Searching book
+Enter the book name to search: harry
+Book found: harry by JK in 2001
+Library Management System
+1. Add Book
+2. List Books
+3. Search Book
+4. Update Book
+5. Delete Book
+6. Exit
+7. List All Books
+8. dev sats
+Enter your choice: 7
+Listing all books
+ harry by JK in 2001
+ potter by rowling in 2002
+ qwert by trewq in 1999
+Library Management System
+1. Add Book
+2. List Books
+3. Search Book
+4. Update Book
+5. Delete Book
+6. Exit
+7. List All Books
+8. dev sats
+Enter your choice: 8
+total count 3
+Books published after 2000: 2
+Unique Auth List:
+ 1: JK
+ 2: rowling
+ 3: trewq
+Library Management System
+1. Add Book
+2. List Books
+3. Search Book
+4. Update Book
+5. Delete Book
+6. Exit
+7. List All Books
+8. dev sats
+Enter your choice: 6
+exiting Good bye !
+=end
