@@ -23,6 +23,14 @@ class Book
     def to_s
         "#{@name} by #{@author} in #{@year}"
     end
+    def age 
+        cur_year = Time.now.year
+        puts "Age : #{cur_year - @year} years"
+    end
+    def recent?
+        return Time.now.year - @year <= 5 
+    end
+
 end
 
 books.push(Book.new("The Hobbit", "J.R.R. Tolkien", 1937))
@@ -62,8 +70,8 @@ def add_book(books)
 
   print "Enter the publication year: "
   year = gets.chomp.to_i
-  if year <= 0
-    puts "Publication year must be a positive integer."
+  if year <= 0 || year > Time.now.year
+    puts "Publication year must be a valid year."
     return
   end
 
@@ -76,14 +84,14 @@ end
 def list_books(books)
     if contains(books)
         puts "Top 3 books"
-        books.first(3).each { |book| puts book }
+        books.first(3).each { |book| puts "#{book}  #{book.age}" }
     end
 end
 
 def list_all_books(books)
     if contains(books)
         puts "Listing all books"
-        books.each { |book| puts book }
+        books.each { |book| puts "#{book}  #{book.age}" }
     end
 end
 
@@ -129,6 +137,7 @@ def update_books(books)
 
             print "Enter the new publication year: "
             n_year = gets.chomp.to_i
+            return if n_year <= 0 || n_year > Time.now.year
 
             find_book.name = n_name
             find_book.author = n_author
@@ -159,8 +168,8 @@ end
 def dev_stats(books)
     if contains(books)
         puts "Total number of books: #{Book.count}"#we can also try @@cnt type also
-        temp = books.count { |book|  book.year > 2000 }
-        puts "Books published after 2000: #{temp}"
+        temp = books.count { |book|  book.recent? }
+        puts "Books published recent: #{temp}"
         temp = books.map { |book| book.author }
         uniq_auth = temp.uniq
         puts "Unique Auth List:"
@@ -230,3 +239,56 @@ loop do
         puts "invalid choice please enter a valid option"
     end
 end
+
+=begin 
+Library Management System
+1. Add Book
+2. List Books
+3. Search Book
+4. Update Book
+5. Delete Book
+6. Exit
+7. List All Books
+8. dev sats
+9. Books between years
+Enter your choice: 7
+Listing all books
+Age : 89 years
+The Hobbit by J.R.R. Tolkien in 1937  
+Age : 25 years
+Harry Potter by J.K. Rowling in 2001  
+Age : 3 years
+The Great Gatsby by F. Scott Fitzgerald in 2023  
+Age : 2 years
+To Kill a Mockingbird by Harper Lee in 2024  
+Library Management System
+1. Add Book
+2. List Books
+3. Search Book
+4. Update Book
+5. Delete Book
+6. Exit
+7. List All Books
+8. dev sats
+9. Books between years
+Enter your choice: 8
+Total number of books: 4
+Books published recent: 2
+Unique Auth List:
+ 1: J.R.R. Tolkien
+ 2: J.K. Rowling
+ 3: F. Scott Fitzgerald
+ 4: Harper Lee
+Library Management System
+1. Add Book
+2. List Books
+3. Search Book
+4. Update Book
+5. Delete Book
+6. Exit
+7. List All Books
+8. dev sats
+9. Books between years
+Enter your choice: 6
+exiting Good bye !
+=end
