@@ -64,9 +64,9 @@ module Searchable
 
     def list(array, limit = nil)
         if limit
-            array.first(limit).each { |book| puts "#{book}  #{book.age}" }
+            array.first(limit).each { |arr| puts "#{arr}" }
         else
-            array.each { |book| puts "#{book}  #{book.age}" }
+            array.each { |arr| puts "#{arr}" }
         end
     end
 
@@ -309,3 +309,48 @@ loop do
 
     puts "\n"
 end
+
+class Movie
+  attr_accessor :name, :director, :year, :genre
+
+  def initialize(name, director, year, genre)
+    @name = name
+    @director = director
+    @year = year
+    @genre = genre
+  end
+
+  def to_s
+    " #{name} by #{director} in (#{year}) [#{genre}]"
+  end
+end
+
+ class Theatre
+    attr_accessor :movies
+
+    include Searchable
+
+    def initialize
+        @movies = []
+    end
+
+    def movies
+        @movies
+    end
+
+    def add_movie(name, director, year, genre)
+        movies.push(Movie.new(name, director, year, genre))
+    end
+end
+
+theatre = Theatre.new
+theatre.add_movie("Inception", "Christopher Nolan", 2010, "Sci-Fi")
+theatre.add_movie("The Matrix", "Wachowskis", 1999, "Action")
+theatre.add_movie("Interstellar", "Christopher Nolan", 2014, "Sci-Fi")
+
+puts "==> Searching movie by cristo':"
+nolan_movies = theatre.finder(theatre.movies, :director, "Christopher Nolan")
+nolan_movies.each { |movie| puts movie }
+
+puts "Displaying all movies:"
+theatre.list(theatre.movies)
