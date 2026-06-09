@@ -21,9 +21,24 @@ module Displayable
     end
 end
 
+module Exportable
+    def to_csv_row
+        attris= [name, author, year, genre]
+        tmp = attris.map do |attr|
+            if attr.to_s.include?(",")
+                "\"#{attr}\""
+            else
+                attr.to_s
+            end
+        end
+        tmp.join(",")
+    end
+end 
+
 class Book
     attr_accessor :name, :author, :year, :genre
     include Displayable
+    include Exportable
 
     def initialize(name, author, year, genre)
         @name = name
@@ -55,9 +70,9 @@ module Searchable
         end
     end
 
-    def find(array,var,name)
-        array.select { |book| book.send(var).downcase.include?(name.downcase) }
-    end
+    def finder(array,var,name)
+         array.select { |book| book.send(var).downcase.include?(name.downcase) }
+    end 
 end
 
 module LibraryMethods
@@ -67,7 +82,7 @@ module LibraryMethods
     end
     
     def update_book(name)
-        find_book = find(books, :name, name)
+        find_book = finder(books, :name, name)
         if find_book.any?
             puts "Book found"
             find_book.first.display
@@ -155,6 +170,16 @@ module LibraryMethods
 
         end
     end
+    def exporter(name)
+        temp_book = finder(books,:name ,name)
+        if temp_book.any?
+            puts "Books found by #{name}:"
+            temp_book.each { |book| puts book.to_csv_row }
+        else
+            puts "No books found by #{name}."
+        end
+    end
+
 end
 
 
@@ -183,6 +208,7 @@ def show_menu
   puts "7. dev stats"
   puts "8. Books between years"
   puts "9. states"
+  puts "10. Export to CSV"
   puts "11. Search by author"
   puts "12. Display sorted by year"
   print "Enter your choice: "
@@ -190,7 +216,7 @@ end
 
 library = Library.new
 library.add_book("The Hobbit", "J.R.R. Tolkien", 1937, "Fiction")
-library.add_book("Harry Potter", "J.K. Rowling", 2001, "Fiction")
+library.add_book("HarryPotter", "J.K, Rowling", 2001, "Fiction")
 library.add_book("The Great Gatsby", "F. Scott Fitzgerald", 2023, "Fiction")
 library.add_book("Ruby Guide", "Dev-Team", 2025, "Technical")
 
@@ -232,7 +258,7 @@ loop do
         print "Enter book name to search: "
         name = gets.chomp.strip
         next if !validate_input(name, "Book name")
-        temp_book = library.find(library.books,:name ,name)
+        temp_book = library.finder(library.books,:name ,name)
         if temp_book.any?
             puts "Books found by #{name}:"
             temp_book.each { |book| puts book }
@@ -259,11 +285,16 @@ loop do
         puts "->Books by Genre:"
         report[:by_genre].each { |genre, count| puts "  *  #{genre}: #{count}" }
         puts "->Average Publication Year: #{report[:average_year]}"
+    when 10
+        print "Enter book name to search and get csv : "
+        name = gets.chomp.strip
+        next if !validate_input(name, "Book name")
+        library.exporter(name)
     when 11
         print "Enter author name to search: "
         name = gets.chomp.strip
         next if !validate_input(name, "Author name")
-        temp_book = library.find(library.books,:author ,name)
+        temp_book = library.finder(library.books,:author ,name)
         if temp_book.any?
             puts "Books found by #{name}:"
             temp_book.each { |book| puts book }
