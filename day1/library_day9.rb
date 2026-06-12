@@ -79,6 +79,19 @@ class Digital_Book < Book
     end
 end 
 
+class Audio_book < Book
+    attr_accessor :duration
+    def initialize(name, author, year, genre, duration)
+        super(name, author, year, genre)
+        @duration = duration
+    end
+    def to_s
+            hrs = duration / 60
+            mins = duration % 60
+            super() + " [Duration: #{hrs}h #{mins}m]"
+    end
+end
+
 module Searchable
 
     def list(array, limit = nil)
@@ -96,9 +109,11 @@ end
 
 module LibraryMethods
     #no need @ as we defined getter in lib so no need to wory
-    def add_book(name, author, year, genre,url = nil)
+    def add_book(name, author, year, genre,url: nil, duration: nil)
         if url
             books.push(Digital_Book.new(name, author, year, genre, url))
+        elsif duration
+            books.push(Audio_book.new(name, author, year, genre, duration))
         else
             books.push(Book.new(name, author, year, genre))
         end
@@ -136,6 +151,10 @@ module LibraryMethods
                 n_url = gets.chomp.strip
                 return if !validate_input(n_url, "URL")
                 find_book.first.url = n_url
+            elsif find_book.first.is_a?(Audio_book)
+                print "Enter new duration in min : "
+                n_duration = gets.chomp.to_i
+                find_book.first.duration = n_duration
             end
             puts "Book updated successfully."
         else
@@ -242,6 +261,7 @@ def show_menu
   puts "11. Search by author"
   puts "12. Display sorted by year"
   puts "13. Add Digital Book"
+  puts "14. Add Audio Book"
   print "Enter your choice: "
 end
 
@@ -358,8 +378,34 @@ begin
         url = gets.chomp.strip
         next if !validate_input(url, "URL")
 
-        library.add_book(name, author, year, genre, url)
+        library.add_book(name, author, year, genre, url:url)
         puts "Book added successfully."
+
+    when 14
+        print "Enter audio book name: "
+        name = gets.chomp.strip
+        next if !validate_input(name, "Audio book name")
+
+        print "Enter author name: "
+        author = gets.chomp.strip
+        next if !validate_input(author, "Author name")
+
+        print "Enter publication year: "
+        year = gets.chomp.to_i
+        raise InvalidInputError, "Publication year must be a valid number" if year <= 0
+
+        print "Enter genre: "
+        genre = gets.chomp.strip
+        if genre.empty?
+            genre = "Uncategorized"
+        end
+
+        print "Enter duration in minutes: "
+        duration = gets.chomp.to_i
+        raise InvalidInputError, "Duration must be a valid +ve number" if duration <= 0
+
+        library.add_book(name, author, year, genre, duration: duration)
+        puts "Audio book added successfully."
 
     else
         puts "Invalid choice. Please try again."
