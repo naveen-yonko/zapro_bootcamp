@@ -1,11 +1,13 @@
+require 'csv'
+
 class BookNotFoundError < StandardError
     def initialize(title)
         super("Book not found: #{title}")
     end
 end
+
 class InvalidInputError < StandardError
 end
-
 
 def validate_input(value, field_name)
     if value.strip.empty?
@@ -16,7 +18,6 @@ def validate_input(value, field_name)
 end
 
 module Displayable
-
     def to_s
         "#{name} by #{author} in #{year} (#{genre})"
     end
@@ -24,7 +25,7 @@ end
 
 module Exportable
     def to_csv_row
-        attris= [name, author, year, genre]
+        attris= [name, author, year, genre, type]
         tmp = attris.map do |attr|
             if attr.to_s.include?(",")
                 "\"#{attr}\""
@@ -34,18 +35,20 @@ module Exportable
         end
         tmp.join(",")
     end
-end 
+end
 
 class Book
-    attr_accessor :name, :author, :year, :genre
+    attr_accessor :name, :author, :year, :genre , :type
     include Displayable
     include Exportable
+    include Comparable
 
-    def initialize(name, author, year, genre)
+    def initialize(name, author, year, genre,type = "Physical")
         @name = name
         @author = author
         @year = year
         @genre = genre
+        @type = type
     end
 
     def age 
@@ -63,8 +66,8 @@ end
 
 class Digital_Book < Book
     attr_accessor :url
-    def initialize(name, author, year, genre, url)
-        super(name, author, year, genre)
+    def initialize(name, author, year,genre, url)
+        super(name, author, year, genre,"Digital")
         @url = url
     end
     def to_s
@@ -75,7 +78,7 @@ end
 class Audio_book < Book
     attr_accessor :duration
     def initialize(name, author, year, genre, duration)
-        super(name, author, year, genre)
+        super(name, author, year, genre,"Audio")
         @duration = duration
     end
     def to_s
@@ -87,18 +90,19 @@ end
 
 module Searchable
 
-    def list(array, limit = nil)
+    def list( limit = nil)
         if limit
-            array.first(limit).each { |arr| puts "#{arr}" }
+            all_books.first(limit).each { |arr| puts "#{arr}" }
         else
-            array.each { |arr| puts "#{arr}" }
+            all_books.each { |arr| puts "#{arr}" }
         end
     end
 
-    def finder(array,var,name)
-         array.select { |book| book.send(var).downcase.include?(name.downcase) }
+    def finder(var,name)
+         all_books.select { |book| book.send(var).downcase.include?(name.downcase) }
     end 
 end
+
 
 module LibraryMethods
     #no need @ as we defined getter in lib so no need to wory
@@ -114,10 +118,9 @@ module LibraryMethods
 
     
     def update_book(name)
-        find_book = finder(books, :name, name)
+        find_book = finder(:name, name)
         if find_book.any?
-            puts "Book found"
-            find_book.first.display
+            puts "Book found #{find_book.first.to_s}"
             print "Enter new name: "
             n_name = gets.chomp.strip
             return if !validate_input(n_name, "Book name")
@@ -139,7 +142,7 @@ module LibraryMethods
             print "Enter new year: "
             n_year = gets.chomp.to_i
             find_book.first.year = n_year
-
+            
             print "Enter new genre: "
             n_genre = gets.chomp.strip
             return if !validate_input(n_genre, "Genre")
@@ -165,7 +168,7 @@ module LibraryMethods
         print "Enter the book name to be delete: "
           name = gets.chomp.downcase.strip
           return if !validate_input(name, "Book name")
-          temp = books.reject! { |book| book.name.downcase == name }
+          temp = all_books.reject! { |book| book.name.downcase == name }
           if temp.nil?
             puts "Book not found please enter a valid book name"
         else
@@ -174,10 +177,10 @@ module LibraryMethods
     end
 
     def dev_stats
-        puts "Total number of books: #{books.length}"
-        temp = books.count { |book|  book.recent? }
+        puts "Total number of books: #{all_books.length}"
+        temp = all_books.count { |book|  book.recent? }
         puts "Books published recent: #{temp}"
-        temp = books.map { |book| book.author }
+        temp = all_books.map { |book| book.author }
         uniq_auth = temp.uniq
         puts "Unique Auth List:"
         uniq_auth.each_with_index { |a,idx|  puts " #{idx + 1}: #{a}" }
@@ -194,7 +197,7 @@ module LibraryMethods
           puts "Invalid search range"
         
         else
-            temp = books.select{ |book| book.year >= strt_year && book.year <= end_year}
+            temp = all_books.select{ |book| book.year >= strt_year && book.year <= end_year}
             
             if temp.empty?
                 puts "No book found in this range (#{strt_year} - #{end_year})"
@@ -206,20 +209,19 @@ module LibraryMethods
     end
 
     def states
-        if books.empty?
+        if all_books.empty?
             return { total: 0, by_genre: { }, average_year: 0 }
         else
-            total = books.length
-            #by_genre = books.group_by { |book| book.genre }
-            by_genre = books.map { |book| book.genre }.tally
-            tot_year = books.reduce(0) { |tot_year, elmt| tot_year + elmt.year }
+            total = all_books.length
+            by_genre = all_books.map { |book| book.genre }.tally
+            tot_year = all_books.reduce(0) { |tot_year, elmt| tot_year + elmt.year }
             average_year = (tot_year / total).round
             return { total: total, by_genre: by_genre, average_year: average_year }
 
         end
     end
     def exporter(name)
-        temp_book = finder(books,:name ,name)
+        temp_book = finder(:name, name)
         if temp_book.any?
             puts "Books found by #{name}:"
             temp_book.each { |book| puts book.to_csv_row }
@@ -230,7 +232,6 @@ module LibraryMethods
 
 end
 
-
 class Library
     attr_accessor :books
 
@@ -240,7 +241,7 @@ class Library
         @books = []
     end
 
-    def books
+    def all_books
         @books
     end    
 end
@@ -264,20 +265,14 @@ def show_menu
   print "Enter your choice: "
 end
 
-library = Library.new
-library.add_book("The Hobbit", "J.R.R. Tolkien", 1937, "Fiction")
-library.add_book("HarryPotter", "J.K, Rowling", 2001, "Fiction")
-library.add_book("The Great Gatsby", "F. Scott Fitzgerald", 2023, "Fiction")
-library.add_book("Ruby Guide", "Dev-Team", 2025, "Technical")
-
 def get_ip
     print "Enter book name: "
     name = gets.chomp.strip
-    next if !validate_input(name, "Book name") #next = continue in java
+    return nil if !validate_input(name, "Book name") #next = continue in java
 
     print "Enter author name: "
     author = gets.chomp.strip
-    next if !validate_input(author, "Author name")
+    return nil if !validate_input(author, "Author name")
 
     print "Enter publication year: "
     year = gets.chomp.to_i
@@ -291,7 +286,43 @@ def get_ip
     return [name, author, year, genre]
 end
 
+library = Library.new
 
+def load_library(library)
+    if File.exist?("books.csv")
+        CSV.foreach("books.csv", headers: true) do |row|
+            case row["type"]
+            when "Digital"
+                library.add_book(row["name"], row["author"], row["year"].to_i, row["genre"], url: row["url"])
+            when "Audio"
+                library.add_book(row["name"], row["author"], row["year"].to_i, row["genre"], duration: row["duration"].to_i)
+            else
+                library.add_book(row["name"], row["author"], row["year"].to_i, row["genre"])
+            end
+        end
+        puts "Library loaded with size #{library.all_books.size}."
+    else
+        raise StandardError, "books.csv file not found ."
+    end
+end
+
+def save_library(library)
+    CSV.open("books.csv", "w") do |csv|
+        csv << ["name", "author", "year", "genre", "type", "url", "duration"]
+        library.all_books.each do |book|
+            if book.is_a?(Digital_Book)
+                csv << [book.name, book.author, book.year, book.genre, "Digital", book.url, nil]
+            elsif book.is_a?(Audio_book)
+                csv << [book.name, book.author, book.year, book.genre, "Audio", nil, book.duration]
+            else
+                csv << [book.name, book.author, book.year, book.genre, "Physical", nil, nil]
+            end
+        end
+    end
+    puts "Library saved in books.csv."
+end
+
+load_library(library)
 
 begin
     loop do
@@ -301,7 +332,10 @@ begin
     case choice
     when 1
         name, author, year, genre = get_ip
-
+        if name.nil? || author.nil? || year.nil? || genre.nil?
+            puts "Invalid input. Book not added."
+            next
+        end
         library.add_book(name, author, year, genre)
         puts "Book added successfully."
 
@@ -309,9 +343,9 @@ begin
         puts "Listing Books Enter number to filter:"
         filter = gets.chomp.to_i
         if filter > 0
-            library.list(library.books,filter)
+            library.list(filter)
         else
-            library.list(library.books)
+            library.list()
         end
 
     when 3
@@ -319,13 +353,13 @@ begin
         name = gets.chomp.strip
         next if !validate_input(name, "Book name")
 
-        temp_book = library.finder(library.books,:name ,name)
+        temp_book = library.finder(:name ,name)
         if temp_book.any?
             puts "Books found by #{name}:"
             temp_book.each { |book| puts book }
         else
             puts "No books found by #{name}."
-            raise BookNotFoundError, "Book not found: #{name}"
+            raise BookNotFoundError.new(name)
         end
 
     when 4
@@ -360,7 +394,7 @@ begin
         print "Enter author name to search: "
         name = gets.chomp.strip
         next if !validate_input(name, "Author name")
-        temp_book = library.finder(library.books,:author ,name)
+        temp_book = library.finder(:author ,name)
         if temp_book.any?
             puts "Books found by #{name}:"
             temp_book.each { |book| puts book }
@@ -372,6 +406,10 @@ begin
         library.books.sort.each { |book| puts book }
     when 13
         name, author, year, genre = get_ip
+        if name.nil? || author.nil? || year.nil? || genre.nil?
+            puts "Invalid input. Digital book not added."
+            next
+        end
 
         print "Enter URL: "
         url = gets.chomp.strip
@@ -382,7 +420,10 @@ begin
 
     when 14
         name, author, year, genre = get_ip
-        
+        if name.nil? || author.nil? || year.nil? || genre.nil?
+            puts "Invalid input. Audio book not added."
+            next
+        end
         print "Enter duration in minutes: "
         duration = gets.chomp.to_i
         raise InvalidInputError, "Duration must be a valid +ve number" if duration <= 0
@@ -405,4 +446,7 @@ rescue StandardError => e
     puts "An error occurred: #{e.message}"
 ensure
     puts "Session ended."
+end
+at_exit do
+    save_library(library)
 end

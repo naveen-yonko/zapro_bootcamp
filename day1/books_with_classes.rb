@@ -1,23 +1,14 @@
 books = []
 
 class Book
-    @@cnt = 0
-    @count = 0
     attr_accessor :name, :author, :year
 
-    class << self
-        attr_accessor :count
-    end
-    
     def initialize(name, author, year)
         @name = name
         @author = author
         @year = year
         self.class.count += 1
         @@cnt += 1
-    end
-    def self.cnt
-        @@cnt
     end
 
     def to_s
@@ -167,7 +158,7 @@ end
 
 def dev_stats(books)
     if contains(books)
-        puts "Total number of books: #{Book.count}"#we can also try @@cnt type also
+        puts "Total number of books: #{books.count}"#we can also try @@cnt type also
         temp = books.count { |book|  book.recent? }
         puts "Books published recent: #{temp}"
         temp = books.map { |book| book.author }
