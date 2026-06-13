@@ -1,4 +1,5 @@
 require 'csv'
+require 'fileutils'
 
 class BookNotFoundError < StandardError
     def initialize(title)
@@ -322,6 +323,14 @@ def save_library(library)
     puts "Library saved in books.csv."
 end
 
+def backup_library
+  if File.exist?("books.csv")
+    FileUtils.cp("books.csv", "books_backup.csv")
+    puts "Backup created: books_backup.csv"
+  end
+end
+
+
 load_library(library)
 
 begin
@@ -371,6 +380,8 @@ begin
     when 5
         library.delete
     when 6
+        backup_library
+        save_library(library)
         puts "Exiting Goodbye!"
         break
     when 7
